@@ -1,16 +1,12 @@
-const mysql = require('mysql2');
+const express = require('express');
+const bodyParser = require('body-parser');
 const config = require('./server_config.json');
-require('dotenv').config()
 
-// create the connection to database
-const connection = mysql.createConnection({
-  uri: config.db,
-  password: process.env.DB_PASSWORD
-});
+const app = express();
+app.use(bodyParser.text());
+app.use(bodyParser.json());
+app.use('/api', require('./routes'));
 
-connection.query(
-  'SELECT * FROM `Role`',
-  function(err, results, fields) {
-    console.log(results);
-  	connection.end()
+app.listen(config.port, () => {
+  console.log(`Started on http://localhost:${config.port}`);
 });
