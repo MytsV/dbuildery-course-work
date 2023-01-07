@@ -1,25 +1,49 @@
 const getConnection = require('./db.js');
 
 const exps = {
-    readTasks: 'SELECT * FROM TASK'
+    readTasks: 'SELECT * FROM TASK',
+    readSingleTask: 'SELECT * FROM TASK WHERE ID=<id>',
+    createTask: 'INSERT INTO TASK(NAME, DESCRIPTION) VALUES (<name>, <description>)'
 };
 
-const execute = async (exp, values) => {
-    const connection = await getConnection();
-    const [ results, fields ] = await connection.execute(exp);
-    return results;
+const insertParams = (exp, params) => {
+    if (!params) return exp;
+    let newExp = exp;
+    for (const [key, value] of Object.entries(params)) {
+        newExp = newExp.replace('<' + key + '>', '\'' + value + '\'');
+    }
+    return newExp;
 }
 
-const getTasks = async (req, res) => {
-    res.status(200).send(await execute(exps.readTasks));
+const runSql = async (exp, params) => {
+    const connection = await getConnection();
+    try {
+        const expFormatted = insertParams(exp, params);
+        const [ results ] = await connection.execute(expFormatted);
+        return results;
+    } catch (err) {
+        console.log(err.toString());
+    } finally {
+        connection.end();
+    }
+}
+
+const getTasks = async (_, res) => {
+    const result = await runSql(exps.readTasks);
+    res.status(200).send(result);
+};
+
+const getSingleTask = async (req, res) => {
+    const result = await runSql(exps.readSingleTask, req.params);
+    res.status(200).send(result);
 };
 
 const createTask = async (req, res) => {
-    const values = extend({}, req.body, req.params);
-    console.log(values);
-    // db.query(`INSERT INTO TASK(ID, NAME, DESCRIPTION, DEADLINE) VALUES (${values.id}, :name, :description, :deadline)`, (err, result) => {
-    //     res.status(200).send(result);
-    // });
+    const resultCreation = await runSql(exps.createTask, req.body);
+    const resultQuery = await runSql(exps.readSingleTask, {
+        id: resultCreation.insertId
+    });
+    res.status(200).send(resultQuery);
 };
 
-module.exports = { getTasks, createTask };
+module.exports = { getTasks, getSingleTask, createTask };

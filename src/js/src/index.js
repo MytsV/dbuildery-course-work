@@ -5,6 +5,7 @@ const config = require('./server_config.json');
 const app = express();
 app.use(bodyParser.text());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/api', require('./routes'));
 
 app.listen(config.port, () => {
