@@ -1,11 +1,11 @@
 const mysql = require('mysql2');
-
-const connectionUrl = 'mysql://root:@localhost:3306/dbuildery'
+const config = require('./server_config.json');
+require('dotenv').config()
 
 // create the connection to database
 const connection = mysql.createConnection({
-  uri: connectionUrl,
-  password: "Haven'tCalledSaul"
+  uri: config.db,
+  password: process.env.DB_PASSWORD
 });
 
 connection.query(
