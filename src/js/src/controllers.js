@@ -3,7 +3,7 @@ const getConnection = require('./db.js');
 const exps = {
     readTasks: 'SELECT * FROM TASK',
     readSingleTask: 'SELECT * FROM TASK WHERE ID=<id>',
-    createTask: 'INSERT INTO TASK(NAME, DESCRIPTION) VALUES (<name>, <description>)'
+    createTask: 'INSERT INTO TASK(NAME, DESCRIPTION, DEADLINE) VALUES (<name>, <description>, <deadline>)'
 };
 
 const insertParams = (exp, params) => {
@@ -12,6 +12,7 @@ const insertParams = (exp, params) => {
     for (const [key, value] of Object.entries(params)) {
         newExp = newExp.replace('<' + key + '>', '\'' + value + '\'');
     }
+    newExp = newExp.replace(/<.*>/, 'NULL');
     return newExp;
 }
 
