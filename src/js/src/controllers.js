@@ -29,17 +29,35 @@ const runSql = async (exp, params) => {
     }
 }
 
+const validate = (required, params) => {
+    for (const value of required) {
+        if (params[value] === undefined) return false;
+    }
+    return true;
+}
+
+const invalidResponse = {
+    status: 400,
+    error: 'Missing required parameters'
+};
+
 const getTasks = async (_, res) => {
     const result = await runSql(exps.readTasks);
     res.status(200).send(result);
 };
 
 const getSingleTask = async (req, res) => {
+    if (!validate(['id'], req.params)) {
+        return res.status(400).send(invalidResponse);
+    }
     const result = await runSql(exps.readSingleTask, req.params);
     res.status(200).send(result);
 };
 
 const createTask = async (req, res) => {
+    if (!validate(['name', 'description'], req.body)) {
+        return res.status(400).send(invalidResponse);
+    }
     const resultCreation = await runSql(exps.createTask, req.body);
     const resultQuery = await runSql(exps.readSingleTask, {
         id: resultCreation.insertId
