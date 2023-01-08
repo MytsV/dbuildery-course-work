@@ -3,7 +3,7 @@
   "version": "2.1.0",
   "main": "index.js",
   "description": "Databases course work template",
-  "repository": "https://github.com/MytsV/dbuildery",
+  "repository": "https://github.com/MytsV/dbuildery-course-work",
   "author": "Victoria Myts <mytsvictoria@gmail.com>",
   "license": "ECL 2.0",
   "scripts": {
