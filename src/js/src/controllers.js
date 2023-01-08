@@ -105,13 +105,21 @@ const createTask = async (req, res) => {
 const getUpdateValues = async (req) => {
     const task = await runSql(exps.readSingleTask, req.params);
     const values = {...task[0], ...req.params, ...req.body};
+    if (values.deadline === null) {
+        values.deadline = undefined;
+    }
+    if (typeof values.deadline === 'object') {
+        const now = new Date();
+        const offsetDate = new Date(values.deadline.getTime() - now.getTimezoneOffset() * 60000);
+        values.deadline = offsetDate.toJSON().slice(0, 19);
+    }
     return values;
 };
 
 const updateTask = async (req, res) => {
     const values = await getUpdateValues(req);
 
-    if (!validateParams(['id', 'name', 'description', 'deadline'], values)) {
+    if (!validateParams(['id', 'name', 'description'], values)) {
         if (!values.id) {
             return res.status(422).send(MISSING_PARAMS_RESPONSE);
         } else {
