@@ -1,8 +1,15 @@
 const getConnection = require('./db.js');
 
+/*
+    SQL expression patterns. Values in <> are to be replaced.
+*/
 const exps = {
   readTasks: 'SELECT * FROM TASK',
   readSingleTask: 'SELECT * FROM TASK WHERE ID=<id>',
+  /*
+    Model requires every task to have a section, but my coursework variant doesn't include CRUD operations for Section.
+    Therefore a stub Section entry with ID 1 will be assigned by default to every task.
+  */
   createTask: 'INSERT INTO TASK(NAME, DESCRIPTION, DEADLINE, SECTION_ID) VALUES (<name>, <description>, <deadline>, 1)',
   updateTask: 'UPDATE TASK SET NAME=<name>, DESCRIPTION=<description>, DEADLINE=<deadline> WHERE ID=<id>',
   deleteTask: 'DELETE FROM TASK WHERE ID=<id>',
@@ -110,6 +117,9 @@ const createTask = async (req, res) => {
 const getUpdateValues = async (req) => {
   const task = await runSql(exps.readSingleTask, req.params);
   const values = {...task[0], ...req.params, ...req.body};
+  /*
+    Handling timezone difference
+  */
   if (values.deadline === null) {
     delete values.deadline;
   }
