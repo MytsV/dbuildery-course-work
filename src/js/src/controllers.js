@@ -111,7 +111,7 @@ const getUpdateValues = async (req) => {
   const task = await runSql(exps.readSingleTask, req.params);
   const values = {...task[0], ...req.params, ...req.body};
   if (values.deadline === null) {
-    values.deadline = undefined;
+    delete values.deadline;
   }
   if (typeof values.deadline === 'object') {
     const now = new Date();
