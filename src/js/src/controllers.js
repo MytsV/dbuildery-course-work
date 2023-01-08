@@ -49,8 +49,18 @@ const notFoundResponse = {
     error: 'Not_Found'
 };
 
+const serverErrorResponse = {
+    status: 500,
+    error: 'Server_Error'
+};
+
 const getTasks = async (_, res) => {
-    const result = await runSql(exps.readTasks);
+    let result;
+    try {
+        result = await runSql(exps.readTasks);
+    } catch (err) {
+        return res.status(500).send(serverErrorResponse);
+    }
     res.status(200).send(result);
 };
 
@@ -59,7 +69,12 @@ const getSingleTask = async (req, res) => {
         return res.status(422).send(missingParamsResponse);
     }
 
-    const result = await runSql(exps.readSingleTask, req.params);
+    let result;
+    try {
+        result = await runSql(exps.readSingleTask, req.params);
+    } catch (err) {
+        return res.status(500).send(serverErrorResponse);
+    }
     
     if (result.length > 0) {
         res.status(200).send(result[0]);
@@ -73,11 +88,16 @@ const createTask = async (req, res) => {
         return res.status(422).send(missingParamsResponse);
     }
 
-    const resultCreation = await runSql(exps.createTask, req.body);
-    const resultQuery = await runSql(exps.readSingleTask, {
-        id: resultCreation.insertId
-    });
-
+    let resultQuery;
+    try {
+        const resultCreation = await runSql(exps.createTask, req.body);
+        resultQuery = await runSql(exps.readSingleTask, {
+            id: resultCreation.insertId
+        });
+    } catch (err) {
+        return res.status(500).send(serverErrorResponse);
+    }
+    
     res.status(200).send(resultQuery);
 };
 
@@ -98,10 +118,15 @@ const updateTask = async (req, res) => {
         }
     }
 
-    await runSql(exps.updateTask, values);
-    const newTask = await runSql(exps.readSingleTask, values);
+    let updatedResult;
+    try {
+        await runSql(exps.updateTask, values);
+        updatedResult = await runSql(exps.readSingleTask, values);
+    } catch (err) {
+        return res.status(500).send(serverErrorResponse);
+    }
     
-    res.status(200).send(newTask[0]);
+    res.status(200).send(updatedResult[0]);
 };
 
 module.exports = { getTasks, getSingleTask, createTask, updateTask };
