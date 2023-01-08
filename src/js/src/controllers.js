@@ -8,20 +8,25 @@ const exps = {
   deleteTask: 'DELETE FROM TASK WHERE ID=<id>',
 };
 
-const NOT_FOUND_RESPONSE = {
+const sendDefaultOK = (res) => res.status(200).send({
+  status: 200,
+  message: 'Success',
+});
+
+const sendNotFound = (res) => res.status(404).send({
   status: 404,
   error: 'Not_Found',
-};
+});
 
-const MISSING_PARAMS_RESPONSE = {
+const sendMissing = (res) => res.status(422).send({
   status: 422,
   error: 'Missing_Required_Parameters',
-};
+});
 
-const SERVER_ERROR_RESPONSE = {
+const sendServerError = (res) => res.status(500).send({
   status: 500,
   error: 'Server_Error',
-};
+});
 
 const insertParams = (exp, params) => {
   if (!params) return exp;
@@ -60,33 +65,33 @@ const getTasks = async (_, res) => {
   try {
     result = await runSql(exps.readTasks);
   } catch (err) {
-    return res.status(500).send(SERVER_ERROR_RESPONSE);
+    return sendServerError(res);
   }
   res.status(200).send(result);
 };
 
 const getSingleTask = async (req, res) => {
   if (!validateParams(['id'], req.params)) {
-    return res.status(422).send(MISSING_PARAMS_RESPONSE);
+    return sendMissing(res);
   }
 
   let result;
   try {
     result = await runSql(exps.readSingleTask, req.params);
   } catch (err) {
-    return res.status(500).send(SERVER_ERROR_RESPONSE);
+    return sendServerError(res);
   }
 
   if (result.length > 0) {
     res.status(200).send(result[0]);
   } else {
-    res.status(404).send(NOT_FOUND_RESPONSE);
+    sendNotFound(res);
   }
 };
 
 const createTask = async (req, res) => {
   if (!validateParams(['name', 'description'], req.body)) {
-    return res.status(422).send(MISSING_PARAMS_RESPONSE);
+    return sendMissing(res);
   }
 
   let resultQuery;
@@ -96,7 +101,7 @@ const createTask = async (req, res) => {
       id: resultCreation.insertId,
     });
   } catch (err) {
-    return res.status(500).send(SERVER_ERROR_RESPONSE);
+    return sendServerError(res);
   }
 
   res.status(200).send(resultQuery);
@@ -121,9 +126,9 @@ const updateTask = async (req, res) => {
 
   if (!validateParams(['id', 'name', 'description'], values)) {
     if (!values.id) {
-      return res.status(422).send(MISSING_PARAMS_RESPONSE);
+      return sendMissing(res);
     } else {
-      return res.status(404).send(NOT_FOUND_RESPONSE);
+      return sendNotFound(res);
     }
   }
 
@@ -132,7 +137,7 @@ const updateTask = async (req, res) => {
     await runSql(exps.updateTask, values);
     updatedResult = await runSql(exps.readSingleTask, values);
   } catch (err) {
-    return res.status(500).send(SERVER_ERROR_RESPONSE);
+    return sendServerError(res);
   }
 
   res.status(200).send(updatedResult[0]);
@@ -140,23 +145,20 @@ const updateTask = async (req, res) => {
 
 const deleteTask = async (req, res) => {
   if (!validateParams(['id'], req.params)) {
-    return res.status(422).send(MISSING_PARAMS_RESPONSE);
+    return sendMissing(res);
   }
 
   let result;
   try {
     result = await runSql(exps.deleteTask, req.params);
   } catch (err) {
-    return res.status(500).send(SERVER_ERROR_RESPONSE);
+    return sendServerError(res);
   }
 
   if (result.affectedRows != 0) {
-    res.status(200).send({
-      status: 200,
-      message: 'Success',
-    });
+    sendDefaultOK(res);
   } else {
-    res.status(404).send(NOT_FOUND_RESPONSE);
+    sendNotFound(res);
   }
 };
 
