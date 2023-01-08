@@ -6,8 +6,11 @@ actionLink: /intro/
 footer: "ECL 2.0 Licensed | Copyright © [2022] [Світлана БАРИЦЬКА Марія Гайдей Людмила ГОРБУНОВА Сергій КОЛОСОВ Вікторія МИЦЬ Нікіта СУТУЛОВ]"
 ---
 
+**Закінчила як курсову роботу:** 
 
-**Виконали:** 
+<span padding-right:5em></span> **Вікторія МИЦЬ [Telegram](https://t.me/vimyts), [GitHub](https://github.com/MytsV), Email mytsvictoria@gmail.com**
+
+**Брали участь у роботі:** 
 
 *студенти 2-го курсу, групи ІМ-12*
 
