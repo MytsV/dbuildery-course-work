@@ -15,7 +15,7 @@ module.exports = {
     }]
   ],
   port: 3030,
-  base: '/dbuildery/',
+  base: '/dbuildery-course-work/',
   theme: 'cool',
   // dest: 'dist',
   head: [
