@@ -7,5 +7,6 @@ router.get('/task', controllers.getTasks);
 router.get('/task/:id', controllers.getSingleTask);
 router.post('/task', controllers.createTask);
 router.put('/task/:id', controllers.updateTask);
+router.delete('/task/:id', controllers.deleteTask);
 
 module.exports = router;
